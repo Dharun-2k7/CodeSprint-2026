@@ -1,0 +1,87 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:15-alpine
+    container_name: codesprint_db
+    environment:
+      POSTGRES_USER: codesprint
+      POSTGRES_PASSWORD: codesprint123
+      POSTGRES_DB: codesprint
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U codesprint"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  judge0:
+    image: judge0/judge0:1.13.0
+    container_name: codesprint_judge0
+    ports:
+      - "2358:2358"
+    environment:
+      - REDIS_HOST=judge0_redis
+      - POSTGRES_HOST=judge0_db
+      - POSTGRES_PORT=5432
+      - POSTGRES_USER=judge0
+      - POSTGRES_PASSWORD=judge0
+      - POSTGRES_DB=judge0
+      - RAILS_MAX_THREADS=5
+      - WORKERS=2
+    depends_on:
+      - judge0_db
+      - judge0_redis
+    volumes:
+      - judge0_data:/judge0
+
+  judge0_db:
+    image: postgres:15-alpine
+    container_name: codesprint_judge0_db
+    environment:
+      POSTGRES_USER: judge0
+      POSTGRES_PASSWORD: judge0
+      POSTGRES_DB: judge0
+    volumes:
+      - judge0_db_data:/var/lib/postgresql/data
+
+  judge0_redis:
+    image: redis:7-alpine
+    container_name: codesprint_judge0_redis
+    volumes:
+      - judge0_redis_data:/data
+
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: codesprint_backend
+    ports:
+      - "8080:8080"
+    environment:
+      - DB_HOST=postgres
+      - DB_PORT=5432
+      - DB_USER=codesprint
+      - DB_PASSWORD=codesprint123
+      - DB_NAME=codesprint
+      - JWT_SECRET=your-secret-key-change-in-production
+      - JUDGE0_URL=http://judge0:2358
+    depends_on:
+      postgres:
+        condition: service_healthy
+      judge0:
+        condition: service_started
+    volumes:
+      - .:/app
+    working_dir: /app
+    command: go run main.go
+
+volumes:
+  postgres_data:
+  judge0_data:
+  judge0_db_data:
+  judge0_redis_data:
+
