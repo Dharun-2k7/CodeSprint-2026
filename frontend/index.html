@@ -13,6 +13,7 @@
             <a class="navbar-brand" href="/">Codesprint</a>
             <div class="navbar-nav ms-auto">
                 <span id="user-info" class="navbar-text me-3" style="display: none;"></span>
+                <button id="admin-btn" class="btn btn-warning me-2" style="display: none;">Admin Panel</button>
                 <button id="login-btn" class="btn btn-outline-light me-2">Login</button>
                 <button id="signup-btn" class="btn btn-primary">Sign Up</button>
                 <button id="logout-btn" class="btn btn-outline-light" style="display: none;">Logout</button>
@@ -80,6 +81,100 @@
                 <div class="col-md-4">
                     <div id="leaderboard"></div>
                 </div>
+            </div>
+        </div>
+
+        <div id="admin-view" style="display: none;">
+            <h2>Admin Panel</h2>
+            <ul class="nav nav-tabs mb-3">
+                <li class="nav-item">
+                    <a class="nav-link active" href="#" onclick="showAdminTab('contests')">Contests</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#" onclick="showAdminTab('problems')">Problems</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#" onclick="showAdminTab('testcases')">Testcases</a>
+                </li>
+            </ul>
+
+            <div id="admin-contests-tab">
+                <h3>Create Contest</h3>
+                <form id="create-contest-form" class="mb-4">
+                    <div class="mb-3">
+                        <label for="contest-title-input" class="form-label">Title</label>
+                        <input type="text" class="form-control" id="contest-title-input" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="contest-start-time" class="form-label">Start Time</label>
+                        <input type="datetime-local" class="form-control" id="contest-start-time" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="contest-end-time" class="form-label">End Time</label>
+                        <input type="datetime-local" class="form-control" id="contest-end-time" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Create Contest</button>
+                </form>
+            </div>
+
+            <div id="admin-problems-tab" style="display: none;">
+                <h3>Create Problem</h3>
+                <form id="create-problem-form" class="mb-4">
+                    <div class="mb-3">
+                        <label for="problem-contest-id" class="form-label">Contest ID</label>
+                        <input type="number" class="form-control" id="problem-contest-id" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="problem-title-input" class="form-label">Title</label>
+                        <input type="text" class="form-control" id="problem-title-input" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="problem-statement" class="form-label">Statement</label>
+                        <textarea class="form-control" id="problem-statement" rows="10" required></textarea>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="problem-time-limit" class="form-label">Time Limit (ms)</label>
+                                <input type="number" class="form-control" id="problem-time-limit" value="1000" required>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="problem-memory-limit" class="form-label">Memory Limit (MB)</label>
+                                <input type="number" class="form-control" id="problem-memory-limit" value="256" required>
+                            </div>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Create Problem</button>
+                </form>
+            </div>
+
+            <div id="admin-testcases-tab" style="display: none;">
+                <h3>Add Testcase</h3>
+                <form id="create-testcase-form" class="mb-4">
+                    <div class="mb-3">
+                        <label for="testcase-problem-id" class="form-label">Problem ID</label>
+                        <input type="number" class="form-control" id="testcase-problem-id" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="testcase-input" class="form-label">Input</label>
+                        <textarea class="form-control" id="testcase-input" rows="5" required></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label for="testcase-expected-output" class="form-label">Expected Output</label>
+                        <textarea class="form-control" id="testcase-expected-output" rows="5" required></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="testcase-is-sample">
+                            <label class="form-check-label" for="testcase-is-sample">
+                                Is Sample Testcase
+                            </label>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Add Testcase</button>
+                </form>
             </div>
         </div>
     </div>

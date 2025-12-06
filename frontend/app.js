@@ -28,6 +28,7 @@ function updateUIForAuth() {
     document.getElementById('login-btn').style.display = 'none';
     document.getElementById('signup-btn').style.display = 'none';
     document.getElementById('logout-btn').style.display = 'block';
+    document.getElementById('admin-btn').style.display = 'block';
     document.getElementById('user-info').style.display = 'block';
     document.getElementById('user-info').textContent = `Welcome, ${currentUser.name}`;
 }
@@ -36,8 +37,12 @@ function setupEventListeners() {
     document.getElementById('login-btn').addEventListener('click', () => showView('login'));
     document.getElementById('signup-btn').addEventListener('click', () => showView('signup'));
     document.getElementById('logout-btn').addEventListener('click', logout);
+    document.getElementById('admin-btn').addEventListener('click', () => showView('admin'));
     document.getElementById('login-form').addEventListener('submit', handleLogin);
     document.getElementById('signup-form').addEventListener('submit', handleSignup);
+    document.getElementById('create-contest-form').addEventListener('submit', handleCreateContest);
+    document.getElementById('create-problem-form').addEventListener('submit', handleCreateProblem);
+    document.getElementById('create-testcase-form').addEventListener('submit', handleCreateTestcase);
 }
 
 function showView(viewName) {
