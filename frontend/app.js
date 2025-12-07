@@ -50,6 +50,7 @@ function showView(viewName) {
     document.getElementById('login-view').style.display = viewName === 'login' ? 'block' : 'none';
     document.getElementById('signup-view').style.display = viewName === 'signup' ? 'block' : 'none';
     document.getElementById('contest-view').style.display = viewName === 'contest' ? 'block' : 'none';
+    document.getElementById('admin-view').style.display = viewName === 'admin' ? 'block' : 'none';
 }
 
 async function handleLogin(e) {
@@ -119,6 +120,7 @@ function logout() {
     document.getElementById('login-btn').style.display = 'block';
     document.getElementById('signup-btn').style.display = 'block';
     document.getElementById('logout-btn').style.display = 'none';
+    document.getElementById('admin-btn').style.display = 'none';
     document.getElementById('user-info').style.display = 'none';
     showView('home');
     if (leaderboardInterval) {
@@ -373,7 +375,124 @@ function displayLeaderboard(leaderboard) {
     container.innerHTML += '</div>';
 }
 
+// Admin functions
+function showAdminTab(tabName, element) {
+    document.getElementById('admin-contests-tab').style.display = tabName === 'contests' ? 'block' : 'none';
+    document.getElementById('admin-problems-tab').style.display = tabName === 'problems' ? 'block' : 'none';
+    document.getElementById('admin-testcases-tab').style.display = tabName === 'testcases' ? 'block' : 'none';
+    
+    // Update active tab
+    document.querySelectorAll('.nav-link').forEach(link => link.classList.remove('active'));
+    if (element) {
+        element.classList.add('active');
+    }
+}
+
+async function handleCreateContest(e) {
+    e.preventDefault();
+    const title = document.getElementById('contest-title-input').value;
+    const startTime = document.getElementById('contest-start-time').value;
+    const endTime = document.getElementById('contest-end-time').value;
+
+    try {
+        const response = await fetch(`${API_BASE}/contests`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${authToken}`
+            },
+            body: JSON.stringify({
+                title: title,
+                start_time: new Date(startTime).toISOString(),
+                end_time: new Date(endTime).toISOString()
+            })
+        });
+
+        const data = await response.json();
+        if (response.ok) {
+            alert(`Contest created successfully! ID: ${data.id}`);
+            document.getElementById('create-contest-form').reset();
+            loadContests();
+        } else {
+            alert(data.error || 'Failed to create contest');
+        }
+    } catch (error) {
+        alert('Error: ' + error.message);
+    }
+}
+
+async function handleCreateProblem(e) {
+    e.preventDefault();
+    const contestId = parseInt(document.getElementById('problem-contest-id').value);
+    const title = document.getElementById('problem-title-input').value;
+    const statement = document.getElementById('problem-statement').value;
+    const timeLimit = parseInt(document.getElementById('problem-time-limit').value);
+    const memoryLimit = parseInt(document.getElementById('problem-memory-limit').value);
+
+    try {
+        const response = await fetch(`${API_BASE}/problems`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${authToken}`
+            },
+            body: JSON.stringify({
+                contest_id: contestId,
+                title: title,
+                statement: statement,
+                time_limit: timeLimit,
+                memory_limit: memoryLimit
+            })
+        });
+
+        const data = await response.json();
+        if (response.ok) {
+            alert(`Problem created successfully! ID: ${data.id}`);
+            document.getElementById('create-problem-form').reset();
+        } else {
+            alert(data.error || 'Failed to create problem');
+        }
+    } catch (error) {
+        alert('Error: ' + error.message);
+    }
+}
+
+async function handleCreateTestcase(e) {
+    e.preventDefault();
+    const problemId = parseInt(document.getElementById('testcase-problem-id').value);
+    const input = document.getElementById('testcase-input').value;
+    const expectedOutput = document.getElementById('testcase-expected-output').value;
+    const isSample = document.getElementById('testcase-is-sample').checked;
+
+    try {
+        const response = await fetch(`${API_BASE}/testcases`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${authToken}`
+            },
+            body: JSON.stringify({
+                problem_id: problemId,
+                input: input,
+                expected_output: expectedOutput,
+                is_sample: isSample
+            })
+        });
+
+        const data = await response.json();
+        if (response.ok) {
+            alert(`Testcase added successfully! ID: ${data.id}`);
+            document.getElementById('create-testcase-form').reset();
+        } else {
+            alert(data.error || 'Failed to add testcase');
+        }
+    } catch (error) {
+        alert('Error: ' + error.message);
+    }
+}
+
 // Make functions available globally
 window.viewProblem = viewProblem;
 window.showSubmissionForm = showSubmissionForm;
+window.showAdminTab = showAdminTab;
 
