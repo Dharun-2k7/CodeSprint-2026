@@ -14,7 +14,9 @@ import (
 
 func main() {
 	// Load environment variables
-	_ = godotenv.Load()
+	if _, err := os.Stat(".env"); err == nil {
+		godotenv.Load()
+	}
 
 	// Initialize database
 	if err := database.InitDB(); err != nil {
@@ -57,6 +59,12 @@ func main() {
 	// Leaderboard routes
 	api.HandleFunc("/leaderboard/{contest_id:[0-9]+}", handlers.GetLeaderboard).Methods("GET")
 
+	/*// User routes (admin only)
+	api.HandleFunc("/users", middleware.AdminMiddleware(handlers.GetUsers)).Methods("GET")
+	api.HandleFunc("/stats", middleware.AdminMiddleware(handlers.GetUserStats)).Methods("GET")
+	api.HandleFunc("/users/approve-admin", middleware.AdminMiddleware(handlers.ApproveAdmin)).Methods("POST")
+	api.HandleFunc("/users/reset-password", middleware.AuthMiddleware(handlers.ResetPassword)).Methods("POST")
+	*/
 	// Serve frontend (static files) - must be last to not interfere with API routes
 	r.PathPrefix("/").Handler(http.StripPrefix("/", http.FileServer(http.Dir("./frontend/"))))
 
@@ -84,4 +92,3 @@ func corsMiddleware(next http.Handler) http.Handler {
 		next.ServeHTTP(w, r)
 	})
 }
-
