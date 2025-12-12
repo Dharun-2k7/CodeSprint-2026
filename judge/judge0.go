@@ -21,9 +21,9 @@ func getJudge0URL() string {
 
 // Language IDs for Judge0
 const (
-	LanguageC      = 50  // C (GCC 9.2.0)
-	LanguageCPP    = 54  // C++ (GCC 9.2.0)
-	LanguagePython = 92  // Python (3.8.1)
+	LanguageC      = 50 // C (GCC 9.2.0)
+	LanguageCPP    = 54 // C++ (GCC 9.2.0)
+	LanguagePython = 92 // Python (3.8.1)
 )
 
 // Judge0Submission represents a submission to Judge0
@@ -35,13 +35,13 @@ type Judge0Submission struct {
 
 // Judge0Response represents a response from Judge0
 type Judge0Response struct {
-	Token       string `json:"token"`
-	Status      *Judge0Status `json:"status,omitempty"`
-	Stdout      string `json:"stdout,omitempty"`
-	Stderr      string `json:"stderr,omitempty"`
-	Time        string `json:"time,omitempty"`
-	Memory      int    `json:"memory,omitempty"`
-	CompileOutput string `json:"compile_output,omitempty"`
+	Token         string        `json:"token"`
+	Status        *Judge0Status `json:"status,omitempty"`
+	Stdout        string        `json:"stdout,omitempty"`
+	Stderr        string        `json:"stderr,omitempty"`
+	Time          string        `json:"time,omitempty"`
+	Memory        int           `json:"memory,omitempty"`
+	CompileOutput string        `json:"compile_output,omitempty"`
 }
 
 // Judge0Status represents the status of a submission
@@ -73,7 +73,7 @@ func SubmitCode(code string, languageID int, input string) (*Judge0Response, err
 	}
 	defer resp.Body.Close()
 
-	if resp.StatusCode != http.StatusCreated {
+	if resp.StatusCode != http.StatusCreated && resp.StatusCode != http.StatusOK {
 		return nil, fmt.Errorf("Judge0 returned status %d", resp.StatusCode)
 	}
 
@@ -157,4 +157,3 @@ func GetLanguageID(language string) int {
 		return LanguageC // default to C
 	}
 }
-

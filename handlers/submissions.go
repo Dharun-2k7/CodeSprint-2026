@@ -109,17 +109,25 @@ func processSubmission(submissionID int, code, language string, testcases []mode
 		// Submit to Judge0
 		result, err := judge.SubmitCode(code, languageID, tc.Input)
 		if err != nil {
+			fmt.Printf("submission %d: SubmitCode error: %v\n", submissionID, err)
 			finalStatus = "runtime_error"
 			allPassed = false
 			break
 		}
 
+		fmt.Printf("submission %d: submitted to Judge0 token=%s\n", submissionID, result.Token)
+
 		// Poll for result
 		pollResult, err := judge.PollSubmissionResult(result.Token, 30, time.Second*2)
 		if err != nil {
+			fmt.Printf("submission %d: PollSubmissionResult error: %v\n", submissionID, err)
 			finalStatus = "runtime_error"
 			allPassed = false
 			break
+		}
+
+		if pollResult != nil && pollResult.Status != nil {
+			fmt.Printf("submission %d: token=%s status=%d (%s)\n", submissionID, result.Token, pollResult.Status.ID, pollResult.Status.Description)
 		}
 
 		// Parse runtime
@@ -135,7 +143,7 @@ func processSubmission(submissionID int, code, language string, testcases []mode
 
 		// Check result status
 		status := judge.MapJudge0StatusToInternal(pollResult.Status.ID)
-		
+
 		// Check if output matches (only if Judge0 says accepted)
 		if pollResult.Status.ID == 3 { // Judge0 accepted status
 			// Trim whitespace for comparison
@@ -339,5 +347,3 @@ func getContestStartTime(contestID int) (time.Time, error) {
 	).Scan(&startTime)
 	return startTime, err
 }
-
-
